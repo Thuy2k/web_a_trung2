@@ -12,7 +12,7 @@ class TermsController extends Controller
     //
     public function index()
     {
-        $category_post = PostCate::where('status',1)->get();
+        $category_post = PostCate::where('status', 1)->get();
         $categories = Category::whereNull('deleted_at')->get();
         $infor_contact = InforContact::all();
         $data = [
@@ -27,10 +27,10 @@ class TermsController extends Controller
                 ],
                 [
                     'name' => 'Điều khoản dịch vụ',
-                ],  
+                ],
             ]
         ];
 
-        return view('user.terms.index',$data);
+        return view('user.terms.index', $data);
     }
 }

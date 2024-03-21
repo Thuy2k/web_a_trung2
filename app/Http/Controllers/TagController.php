@@ -17,15 +17,13 @@ class TagController extends Controller
 
     public function checkTagSlug($slug)
     {
-        if(empty($slug))
-        {
+        if (empty($slug)) {
             abort(404);
         }
-        
-        $tag = Tag::whereNull('deleted_at')->where('slug',$slug)->with('product_tag')->first();
 
-        if(empty($tag))
-        {
+        $tag = Tag::whereNull('deleted_at')->where('slug', $slug)->with('product_tag')->first();
+
+        if (empty($tag)) {
             abort(404);
         }
         return $tag;
@@ -36,19 +34,16 @@ class TagController extends Controller
         $row = $this->checkTagSlug($slug);
 
         $categories = Category::whereNull('deleted_at')->get();
-        
+
         $list_id = $row->product_tag->pluck('product_id');
 
-        $query = Product::whereNull('deleted_at')->whereIn('id',$list_id);
-        if(!empty($request->key_word))
-        {
-            $products = $query->where('name','like','%'.$request->key_word.'%')->paginate(12);
-        }
-        else
-        {
+        $query = Product::whereNull('deleted_at')->whereIn('id', $list_id);
+        if (!empty($request->key_word)) {
+            $products = $query->where('name', 'like', '%' . $request->key_word . '%')->paginate(12);
+        } else {
             $products = $query->paginate(12);
-        }   
-        $slides = Slide::whereNull('deleted_at')->orderBy('created_at','desc')->offset(0)->limit(4)->get();   
+        }
+        $slides = Slide::whereNull('deleted_at')->orderBy('created_at', 'desc')->offset(0)->limit(4)->get();
         $title = $row->name;
         $breadcrumbs = [
             [
@@ -64,8 +59,8 @@ class TagController extends Controller
                 // 'url'  => 'admin/user/create',
             ],
         ];
-        $category_post = PostCate::where('status',1)->get();
+        $category_post = PostCate::where('status', 1)->get();
         $infor_contact = InforContact::all();
-       return view('user.home.index', compact('categories','products','slides','title','breadcrumbs', 'category_post', 'infor_contact'));
+        return view('user.home.index', compact('categories', 'products', 'slides', 'title', 'breadcrumbs', 'category_post', 'infor_contact'));
     }
 }

@@ -24,10 +24,9 @@ class Post extends Model
     public function getImagePrimary()
     {
         $id = $this->id;
-        $image = ImagePost::where('post_id',$id)->where('is_primary',1)->first();
-        
-        if(empty($image))
-        {
+        $image = ImagePost::where('post_id', $id)->where('is_primary', 1)->first();
+
+        if (empty($image)) {
             return '/images/post/no-image-post.png';
         }
 
@@ -37,10 +36,9 @@ class Post extends Model
     public function getExtraImage()
     {
         $id = $this->id;
-        $image = ImagePost::where('post_id',$id)->where('is_primary',0)->get();
-        
-        if(empty($image))
-        {
+        $image = ImagePost::where('post_id', $id)->where('is_primary', 0)->get();
+
+        if (empty($image)) {
             return;
         }
 

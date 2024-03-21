@@ -21,14 +21,13 @@ class ProductController extends Controller
     //
     public function __construct()
     {
-        $this->middleware(['auth','admin']);
+        $this->middleware(['auth', 'admin']);
     }
     public function index(Request $request)
     {
         $query = Product::whereNull('deleted_at');
-        if(!empty($request->search))
-        {
-            $query->where('name','like','%'.$request->search.'%');
+        if (!empty($request->search)) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
         $product = $query->with('category')->paginate(10);
         // dd($product[0]->category->name);
@@ -40,9 +39,9 @@ class ProductController extends Controller
                     // 'url'  => 'admin/dashboard',
                 ],
             ],
-            'isProduct'=>true,
+            'isProduct' => true,
         ];
-        return view('admin.product.index',$data);
+        return view('admin.product.index', $data);
     }
 
     public function create(Request $request)
@@ -61,31 +60,30 @@ class ProductController extends Controller
                     // 'url'  => 'admin/user/create',
                 ],
             ],
-            'isProduct'=>true,
+            'isProduct' => true,
         ];
-        return view('admin.product.createOrEdit',$data);
+        return view('admin.product.createOrEdit', $data);
     }
 
-    public function edit(Request $request,$id)
+    public function edit(Request $request, $id)
     {
-        $product = Product::where('id',$id)->whereNull('deleted_at')->with(['category','images'])->first();
+        $product = Product::where('id', $id)->whereNull('deleted_at')->with(['category', 'images'])->first();
         // dd($product);
         $categories = Category::whereNull('deleted_at')->get();
-        if(empty($product))
-        {
+        if (empty($product)) {
             return redirect()->route('admin.product.index')->with('error', 'Không tìm thấy sản phẩm');
         }
 
-        $image = ImageProduct::where('product_id',$product->id)->where('is_primary',1)->first();
-        $list_image = ImageProduct::where('product_id',$product->id)->where('is_primary',0)->get();
+        $image = ImageProduct::where('product_id', $product->id)->where('is_primary', 1)->first();
+        $list_image = ImageProduct::where('product_id', $product->id)->where('is_primary', 0)->get();
 
-        $tags = ProductTag::whereNull('deleted_at')->where('product_id',$id)->with(['tag','product'])->get();
+        $tags = ProductTag::whereNull('deleted_at')->where('product_id', $id)->with(['tag', 'product'])->get();
         // $url = 'admin/user/edit/'.$id;
         $data = [
             'categories' => $categories,
             'rows' => $product,
-            'primary'=>$image,
-            'list_image'=>$list_image,
+            'primary' => $image,
+            'list_image' => $list_image,
             'tags' => $tags,
             'breadcrumbs'        => [
                 [
@@ -97,35 +95,34 @@ class ProductController extends Controller
                     // 'url'  => $url,
                 ],
             ],
-            'isProduct'=>true,
+            'isProduct' => true,
         ];
-        return view('admin.product.createOrEdit',$data);
+        return view('admin.product.createOrEdit', $data);
     }
 
-    public function addImageProduct($product,$requestImage,$primary=false)
+    public function addImageProduct($product, $requestImage, $primary = false)
     {
         $image = new  ImageProduct();
         $image->product_id = $product->id;
-        if($primary)
-        {
+        if ($primary) {
             $image->is_primary = $primary;
         }
         $image->save();
 
         $file = $requestImage->getClientOriginalName();
         $fileName = pathinfo($file, PATHINFO_FILENAME);
-        $imageName = $fileName."_".$product->id."_".$image->id.".".$requestImage->getClientOriginalExtension();
-        
-        $image_resize = Image::make($requestImage->getRealPath());              
+        $imageName = $fileName . "_" . $product->id . "_" . $image->id . "." . $requestImage->getClientOriginalExtension();
+
+        $image_resize = Image::make($requestImage->getRealPath());
         $image_resize->resize(300, 450);
-        $image_resize->save('images/product/'.$imageName);
-        
-        $image->path = '/images/product/'.$imageName;
+        $image_resize->save(public_path('images/product/' . $imageName));
+
+        $image->path = '/images/product/' . $imageName;
         $image->name = $imageName;
         $image->save();
         return;
     }
-    
+
     public function store(Request $request)
     {
         // dd($request->all());
@@ -144,19 +141,16 @@ class ProductController extends Controller
             'price.required' => 'Nhập giá sản phẩm',
             'image.required' => 'Chọn ảnh',
             'digits_between' => 'Giá phải nhiều hơn 1000 và nhỏ hơn 99999999999',
-            'mimes'=>'Ảnh phải có dạng *.jpg,*.png,*.jpeg',
+            'mimes' => 'Ảnh phải có dạng *.jpg,*.png,*.jpeg',
             // 'max'=> 'The :attribute must be less than :max',
         ];
-        $validator = Validator::make($request->all(),$rule,$messages);
-        if($validator->fails())
-        {
+        $validator = Validator::make($request->all(), $rule, $messages);
+        if ($validator->fails()) {
             return redirect()->back()->withErrors($validator);
         }
-        if(empty($request->id))
-        {
-            $product_check = Product::whereNull('deleted_at')->where('name',$request->name)->get();
-            if(count($product_check)>0)
-            {
+        if (empty($request->id)) {
+            $product_check = Product::whereNull('deleted_at')->where('name', $request->name)->get();
+            if (count($product_check) > 0) {
                 return redirect()->back()->with('error', 'Đã có tên sản phẩm');
             }
 
@@ -167,39 +161,33 @@ class ProductController extends Controller
             $product->price = $request->price;
             $product->save();
 
-            if(!empty($request->image))
-            {
-                $this->addImageProduct($product,$request->image,true);
+            if (!empty($request->image)) {
+                $this->addImageProduct($product, $request->image, true);
             }
 
-            if(!empty($request->image1))
-            {
-                $this->addImageProduct($product,$request->image1);
+            if (!empty($request->image1)) {
+                $this->addImageProduct($product, $request->image1);
             }
 
-            if(!empty($request->image2))
-            {
-                $this->addImageProduct($product,$request->image2);
+            if (!empty($request->image2)) {
+                $this->addImageProduct($product, $request->image2);
             }
 
-            if(!empty($request->image3))
-            {
-                $this->addImageProduct($product,$request->image3);
+            if (!empty($request->image3)) {
+                $this->addImageProduct($product, $request->image3);
             }
 
             return redirect()->route('admin.product.index')->with('success', 'Tạo sản phẩm thành công');
         }
 
         //Edit
-        $product = Product::where('id',$request->id)->whereNull('deleted_at')->first();
-        if(empty($product))
-        {
+        $product = Product::where('id', $request->id)->whereNull('deleted_at')->first();
+        if (empty($product)) {
             return redirect()->back()->with('error', 'Không tìm thấy sản phẩm');
         }
-        
-        $product_check = Product::whereNull('deleted_at')->where('id','<>',$request->id)->where('name',$request->name)->get();
-        if(count($product_check)>0)
-        {
+
+        $product_check = Product::whereNull('deleted_at')->where('id', '<>', $request->id)->where('name', $request->name)->get();
+        if (count($product_check) > 0) {
             return redirect()->back()->with('error', 'Đã có tên sản phẩm');
         }
 
@@ -208,57 +196,52 @@ class ProductController extends Controller
         $product->category_id = $request->category;
         $product->price = $request->price;
         $product->save();
-        
-        if(!empty($request->image))
-        {
-            if(!empty($request->id_img))
-            {
+
+        if (!empty($request->image)) {
+            if (!empty($request->id_img)) {
                 $image = ImageProduct::find($request->id_img);
-                if(File::exists(public_path().$image->path)) {
-                    File::delete(public_path().$image->path);
+                // dd($image);
+                if ($image) {
+                    if (File::exists(public_path() . $image->path)) {
+                        File::delete(public_path() . $image->path);
+                    }
+                    $image->forceDelete();
                 }
-                $image->forceDelete();
             }
-            $this->addImageProduct($product,$request->image,true);
+            $this->addImageProduct($product, $request->image, true);
         }
 
-        if(!empty($request->image1))
-        {   
-            if(!empty($request->id_img_0))
-            {
+        if (!empty($request->image1)) {
+            if (!empty($request->id_img_0)) {
                 $image = ImageProduct::find($request->id_img_0);
-                if(File::exists(public_path().$image->path)) {
-                    File::delete(public_path().$image->path);
+                if (File::exists(public_path() . $image->path)) {
+                    File::delete(public_path() . $image->path);
                 }
                 $image->forceDelete();
             }
-            $this->addImageProduct($product,$request->image1);
+            $this->addImageProduct($product, $request->image1);
         }
 
-        if(!empty($request->image2))
-        {   
-            if(!empty($request->id_img_1))
-            {
+        if (!empty($request->image2)) {
+            if (!empty($request->id_img_1)) {
                 $image = ImageProduct::find($request->id_img_1);
-                if(File::exists(public_path().$image->path)) {
-                    File::delete(public_path().$image->path);
+                if (File::exists(public_path() . $image->path)) {
+                    File::delete(public_path() . $image->path);
                 }
                 $image->forceDelete();
             }
-            $this->addImageProduct($product,$request->image2);
+            $this->addImageProduct($product, $request->image2);
         }
 
-        if(!empty($request->image3))
-        {   
-            if(!empty($request->id_img_2))
-            {
+        if (!empty($request->image3)) {
+            if (!empty($request->id_img_2)) {
                 $image = ImageProduct::find($request->id_img_2);
-                if(File::exists(public_path().$image->path)) {
-                    File::delete(public_path().$image->path);
+                if (File::exists(public_path() . $image->path)) {
+                    File::delete(public_path() . $image->path);
                 }
                 $image->forceDelete();
             }
-            $this->addImageProduct($product,$request->image3);
+            $this->addImageProduct($product, $request->image3);
         }
 
         return redirect()->back()->with('success', 'Cập nhật sản phẩm thành công');
@@ -268,56 +251,46 @@ class ProductController extends Controller
     {
         // dd(json_decode($request->list_id));
         $list_id = json_decode($request->list_id);
-        foreach($list_id as $id)
-        {
+        foreach ($list_id as $id) {
             $product = Product::find($id);
-            if(!empty($product))
-            {
+            if (!empty($product)) {
                 $images = ImageProduct::whereNull('deleted_at')
-                                        ->where('product_id',$product->id)
-                                        ->get();
-                if(count($images) > 0)
-                {
-                    foreach($images as $image)
-                    {
-                        if(File::exists(public_path().$image->path)) {
-                            File::delete(public_path().$image->path);
+                    ->where('product_id', $product->id)
+                    ->get();
+                if (count($images) > 0) {
+                    foreach ($images as $image) {
+                        if (File::exists(public_path() . $image->path)) {
+                            File::delete(public_path() . $image->path);
                         }
                         $image->forceDelete();
                     }
                 }
 
                 $product_tag = ProductTag::whereNull('deleted_at')
-                                ->where('product_id',$product->id)
-                                ->get();
-                if(!empty($product_tag))
-                {
-                    foreach($product_tag as $item)
-                    {
+                    ->where('product_id', $product->id)
+                    ->get();
+                if (!empty($product_tag)) {
+                    foreach ($product_tag as $item) {
                         $item->delete();
                     }
                 }
 
                 $product_detail = ProductDetail::whereNull('deleted_at')
-                        ->where('product_id',$product->id)
-                        ->get();
+                    ->where('product_id', $product->id)
+                    ->get();
 
-                if(!empty($product_detail))
-                {
-                    foreach($product_detail as $item_detail)
-                    {
+                if (!empty($product_detail)) {
+                    foreach ($product_detail as $item_detail) {
                         $item_detail->delete();
                     }
                 }
 
                 $wishlist = Wishlist::whereNull('deleted_at')
-                    ->where('product_id',$product->id)
+                    ->where('product_id', $product->id)
                     ->get();
 
-                if(!empty($wishlist))
-                {
-                    foreach($wishlist as $item_wishlist)
-                    {
+                if (!empty($wishlist)) {
+                    foreach ($wishlist as $item_wishlist) {
                         $item_wishlist->delete();
                     }
                 }
@@ -328,22 +301,20 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Xóa sản phẩm thành công');
     }
 
-    public function addTag($id = '',Request $request)
+    public function addTag($id = '', Request $request)
     {
-        if(empty($id))
-        {
+        if (empty($id)) {
             return response()->json([
-                'error'=>true,
-                'message'=>'Không tìm thấy sản phẩm',
+                'error' => true,
+                'message' => 'Không tìm thấy sản phẩm',
                 'data' => null,
             ]);
         }
 
-        if(empty($request->value))
-        {
+        if (empty($request->value)) {
             return response()->json([
-                'error'=>true,
-                'message'=>'Nhập từ khóa',
+                'error' => true,
+                'message' => 'Nhập từ khóa',
                 'data' => null,
             ]);
         }
@@ -351,35 +322,32 @@ class ProductController extends Controller
         $value = strtolower($request->value);
         $slug =  Str::slug($value, '-');
 
-        $tag = Tag::whereNull('deleted_at')->where('slug',$slug)->first();
-        if(empty($tag))
-        {
+        $tag = Tag::whereNull('deleted_at')->where('slug', $slug)->first();
+        if (empty($tag)) {
             $tag = new Tag();
             $tag->name = $value;
             $tag->slug = $slug;
             $tag->save();
         }
 
-        $product_tag = ProductTag::whereNull('deleted_at')->where('product_id',$id)
-                ->whereHas('tag',function($query) use ($slug){
-                    $query->where('slug',$slug);
-                })->first();
+        $product_tag = ProductTag::whereNull('deleted_at')->where('product_id', $id)
+            ->whereHas('tag', function ($query) use ($slug) {
+                $query->where('slug', $slug);
+            })->first();
 
-        if(!empty($product_tag))
-        {
+        if (!empty($product_tag)) {
             return response()->json([
-                'error'=>true,
-                'message'=>'Từ khóa đã tồn tại',
+                'error' => true,
+                'message' => 'Từ khóa đã tồn tại',
                 'data' => null,
             ]);
         }
 
-        $data = ProductTag::whereNull('deleted_at')->where('product_id',$id)->with(['tag','product'])->get();
-        if(count($data) >= 20)
-        {
+        $data = ProductTag::whereNull('deleted_at')->where('product_id', $id)->with(['tag', 'product'])->get();
+        if (count($data) >= 20) {
             return response()->json([
-                'error'=>true,
-                'message'=>'Chỉ được nhập tối đa 20 từ khóa',
+                'error' => true,
+                'message' => 'Chỉ được nhập tối đa 20 từ khóa',
                 'data' => null,
             ]);
         }
@@ -389,57 +357,53 @@ class ProductController extends Controller
         $product_tag->tag_id = $tag->id;
         $product_tag->save();
 
-        $data = ProductTag::whereNull('deleted_at')->where('product_id',$id)->with(['tag','product'])->get();
-    
+        $data = ProductTag::whereNull('deleted_at')->where('product_id', $id)->with(['tag', 'product'])->get();
+
         return response()->json([
-            'error'=>false,
-            'message'=>'Tạo từ khóa thành công',
-            'data'=>$data,
+            'error' => false,
+            'message' => 'Tạo từ khóa thành công',
+            'data' => $data,
         ]);
     }
 
-    public function removeTag($id = '',Request $request)
+    public function removeTag($id = '', Request $request)
     {
         $id_tag = $request->idTag;
-        if(empty($id))
-        {
+        if (empty($id)) {
             return response()->json([
-                'error'=>true,
-                'message'=>'Không tìm thấy sản phẩm',
+                'error' => true,
+                'message' => 'Không tìm thấy sản phẩm',
                 'data' => null,
             ]);
         }
 
-        if(empty($id_tag))
-        {
+        if (empty($id_tag)) {
             return response()->json([
-                'error'=>true,
-                'message'=>'Không tìm thấy từ khóa sản phẩm',
+                'error' => true,
+                'message' => 'Không tìm thấy từ khóa sản phẩm',
                 'data' => null,
             ]);
         }
 
-        $product_tag = ProductTag::whereNull('deleted_at')->where('product_id',$id)
-                        ->where('tag_id',$id_tag)->first();
+        $product_tag = ProductTag::whereNull('deleted_at')->where('product_id', $id)
+            ->where('tag_id', $id_tag)->first();
 
-        if(empty($product_tag))
-        {
+        if (empty($product_tag)) {
             return response()->json([
-                'error'=>true,
-                'message'=>'Không tìm thấy từ khóa sản phẩm',
+                'error' => true,
+                'message' => 'Không tìm thấy từ khóa sản phẩm',
                 'data' => null,
             ]);
         }
 
         $product_tag->delete();
 
-        $data = ProductTag::whereNull('deleted_at')->where('product_id',$id)->with(['tag','product'])->get();
-    
-        return response()->json([
-            'error'=>false,
-            'message'=>'Xóa từ khóa thành công',
-            'data'=>$data,
-        ]);
+        $data = ProductTag::whereNull('deleted_at')->where('product_id', $id)->with(['tag', 'product'])->get();
 
+        return response()->json([
+            'error' => false,
+            'message' => 'Xóa từ khóa thành công',
+            'data' => $data,
+        ]);
     }
 }

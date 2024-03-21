@@ -12,7 +12,7 @@ class PrivacyController extends Controller
     //
     public function index()
     {
-        $category_post = PostCate::where('status',1)->get();
+        $category_post = PostCate::where('status', 1)->get();
         $categories = Category::whereNull('deleted_at')->get();
         $infor_contact = InforContact::all();
         $data = [
@@ -27,10 +27,10 @@ class PrivacyController extends Controller
                 ],
                 [
                     'name' => 'Chính sách bảo mật',
-                ],  
+                ],
             ]
         ];
- 
-        return view('user.privacy.index',$data);
+
+        return view('user.privacy.index', $data);
     }
 }

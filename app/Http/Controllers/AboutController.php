@@ -17,7 +17,7 @@ class AboutController extends Controller
     //
     public function index()
     {
-        $category_post = PostCate::where('status',1)->get();
+        $category_post = PostCate::where('status', 1)->get();
         $categories = Category::whereNull('deleted_at')->get();
         $infor_contact = InforContact::all();
         $data = [
@@ -32,10 +32,10 @@ class AboutController extends Controller
                 ],
                 [
                     'name' => 'Giới thiệu',
-                ],  
+                ],
             ]
         ];
- 
-        return view('user.about.index',$data);
+
+        return view('user.about.index', $data);
     }
 }

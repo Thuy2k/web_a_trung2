@@ -17,7 +17,7 @@ class SlideController extends Controller
     //
     public function __construct()
     {
-        $this->middleware(['auth','admin']);
+        $this->middleware(['auth', 'admin']);
     }
     public function index(Request $request)
     {
@@ -30,9 +30,9 @@ class SlideController extends Controller
                     // 'url'  => 'admin/dashboard',
                 ],
             ],
-            'isSlide'=>true,
+            'isSlide' => true,
         ];
-        return view('admin.slide.index',$data);
+        return view('admin.slide.index', $data);
     }
 
     public function store(Request $request)
@@ -42,12 +42,11 @@ class SlideController extends Controller
         ];
         $messages = [
             'image.required' => 'Chọn hình ảnh',
-            'image.mimes'=>'Ảnh phải có dạng *.png, *.jpg, *jpeg',
+            'image.mimes' => 'Ảnh phải có dạng *.png, *.jpg, *jpeg',
         ];
 
-        $validator = Validator::make($request->all(),$rule,$messages);
-        if($validator->fails())
-        {
+        $validator = Validator::make($request->all(), $rule, $messages);
+        if ($validator->fails()) {
             return redirect()->back()->withError($validator->errors()->first());
         }
         $regex =  '(http|https):\/\/(\w+:{0,1}\w*)?(\S+)(:[0-9]+)?(\/|\/([\w\#!:.?+=&%!\-\/]))?';
@@ -55,8 +54,8 @@ class SlideController extends Controller
         if (!preg_match("/^$regex$/i", $request->path)) {
             dd(!preg_match("/^$regex$/i", $request->path), $request->path);
             return redirect()->back()->withError('Đường dẫn không hợp lệ');
-        } 
-        
+        }
+
         $slide = new Slide();
         $slide->user_id = Auth::id();
         $slide->title = $request->title;
@@ -64,15 +63,14 @@ class SlideController extends Controller
         $slide->path = $request->path;
         $slide->save();
 
-        if(!empty($request->image))
-        {
-            $imageName=$slide->id.".".$request->image->getClientOriginalExtension();
+        if (!empty($request->image)) {
+            $imageName = $slide->id . "." . $request->image->getClientOriginalExtension();
 
-            $image_resize = Image::make($request->image->getRealPath());              
-            $image_resize->resize(400,400);
-            $image_resize->save('images/slide/'.$imageName);
+            $image_resize = Image::make($request->image->getRealPath());
+            $image_resize->resize(400, 400);
+            $image_resize->save(public_path('images/slide/' . $imageName));
             // $request->image->move(public_path('images/slide'), $imageName);
-            $slide->image = '/images/slide/'.$imageName;
+            $slide->image = '/images/slide/' . $imageName;
         }
         $slide->save();
         return redirect()->back()->with('success', 'Tạo trình chiếu thành công');
@@ -82,27 +80,25 @@ class SlideController extends Controller
     {
         // dd(json_decode($request->list_id));
         $list_id = json_decode($request->list_id);
-        foreach($list_id as $id)
-        {
+        foreach ($list_id as $id) {
             $slide = slide::find($id);
-            if(!empty($slide))
-            {
-                if(File::exists(public_path().$slide->image)) {
-                    File::delete(public_path().$slide->image);
+            if (!empty($slide)) {
+                if (File::exists(public_path() . $slide->image)) {
+                    File::delete(public_path() . $slide->image);
                 }
                 $slide->forceDelete();
             }
         }
         return redirect()->back()->with('success', 'Xóa trình chiếu thành công');
     }
-    public function get_path_product(Request $request){
-        $output = array(); 
+    public function get_path_product(Request $request)
+    {
+        $output = array();
         $result = Product::where('name', $request->product_name)->first();
-        if($result){
+        if ($result) {
             $output['path'] = 'product/' . $result->id . '/detail';
             $output['result'] = 1;
-        }
-        else{
+        } else {
             $output['path'] = $request->product_name;
             $output['result'] = -1;
         }

@@ -18,17 +18,16 @@ class PostController extends Controller
     //
     public function __construct()
     {
-        $this->middleware(['auth','admin']);
+        $this->middleware(['auth', 'admin']);
     }
     public function index(Request $request)
     {
         $query = Post::whereNull('deleted_at');
-        if(!empty($request->search))
-        {
-            $query->where('name','like','%'.$request->search.'%');
+        if (!empty($request->search)) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
         $post = $query->paginate(10);
-        
+
         $data = [
             'rows' => $post,
             'breadcrumbs'        => [
@@ -37,10 +36,10 @@ class PostController extends Controller
                     // 'url'  => 'admin/dashboard',
                 ],
             ],
-            'isPost'=>true,
+            'isPost' => true,
         ];
-        
-        return view('admin.post.index',$data);
+
+        return view('admin.post.index', $data);
     }
 
     public function create(Request $request)
@@ -59,30 +58,29 @@ class PostController extends Controller
                     // 'url'  => 'admin/user/create',
                 ],
             ],
-            'isPost'=>true,
+            'isPost' => true,
         ];
-        
-        return view('admin.post.createOrEdit',$data);
+
+        return view('admin.post.createOrEdit', $data);
     }
 
-    public function edit(Request $request,$id)
+    public function edit(Request $request, $id)
     {
-        $post = Post::where('id',$id)->whereNull('deleted_at')->with(['images'])->first();
+        $post = Post::where('id', $id)->whereNull('deleted_at')->with(['images'])->first();
         // dd($product);
         $post_cates = PostCate::whereNull('deleted_at')->get();
-        if(empty($post))
-        {
+        if (empty($post)) {
             return redirect()->route('admin.post.index')->with('error', 'Không tìm thấy bài viết');
         }
 
-        $image = ImagePost::where('post_id',$post->id)->where('is_primary',1)->first();
-        $list_image = ImagePost::where('post_id',$post->id)->where('is_primary',0)->get();
+        $image = ImagePost::where('post_id', $post->id)->where('is_primary', 1)->first();
+        $list_image = ImagePost::where('post_id', $post->id)->where('is_primary', 0)->get();
 
         $data = [
             'post_cates' => $post_cates,
             'rows' => $post,
-            'primary'=>$image,
-            'list_image'=>$list_image,
+            'primary' => $image,
+            'list_image' => $list_image,
             'breadcrumbs'        => [
                 [
                     'name' => 'Bài viết',
@@ -93,36 +91,35 @@ class PostController extends Controller
                     // 'url'  => $url,
                 ],
             ],
-            'isPost'=>true,
+            'isPost' => true,
         ];
-       
-        return view('admin.post.createOrEdit',$data);
+
+        return view('admin.post.createOrEdit', $data);
     }
 
-    public function addImagePost($post,$requestImage,$primary=false)
+    public function addImagePost($post, $requestImage, $primary = false)
     {
         $image = new ImagePost();
         $image->post_id = $post->id;
-        if($primary)
-        {
+        if ($primary) {
             $image->is_primary = $primary;
         }
         $image->save();
 
         $file = $requestImage->getClientOriginalName();
         $fileName = pathinfo($file, PATHINFO_FILENAME);
-        $imageName = $fileName."_".$post->id."_".$image->id.".".$requestImage->getClientOriginalExtension();
-        
-        $image_resize = Image::make($requestImage->getRealPath());              
+        $imageName = $fileName . "_" . $post->id . "_" . $image->id . "." . $requestImage->getClientOriginalExtension();
+
+        $image_resize = Image::make($requestImage->getRealPath());
         $image_resize->resize(300, 450);
-        $image_resize->save('images/post/'.$imageName);
-        
-        $image->path = '/images/post/'.$imageName;
+        $image_resize->save(public_path('images/post/' . $imageName));
+
+        $image->path = '/images/post/' . $imageName;
         $image->name = $imageName;
         $image->save();
         return;
     }
-    
+
     public function store(Request $request)
     {
         // dd($request->all());
@@ -140,19 +137,16 @@ class PostController extends Controller
             'description.required' => 'Nhập mô tả',
             'image.required' => 'Chọn ảnh',
             'path.required' => 'Nhập tên bài viết để có đường dẫn',
-            'mimes'=>'Ảnh phải có dạng *.jpg,*.png,*.jpeg',
+            'mimes' => 'Ảnh phải có dạng *.jpg,*.png,*.jpeg',
             // 'max'=> 'The :attribute must be less than :max',
         ];
-        $validator = Validator::make($request->all(),$rule,$messages);
-        if($validator->fails())
-        {
+        $validator = Validator::make($request->all(), $rule, $messages);
+        if ($validator->fails()) {
             return redirect()->back()->withErrors($validator);
         }
-        if(empty($request->id))
-        {
-            $post_check = Post::whereNull('deleted_at')->where('name',$request->name)->get();
-            if(count($post_check)>0)
-            {
+        if (empty($request->id)) {
+            $post_check = Post::whereNull('deleted_at')->where('name', $request->name)->get();
+            if (count($post_check) > 0) {
                 return redirect()->back()->with('error', 'Đã có tên bài viết');
             }
 
@@ -165,24 +159,21 @@ class PostController extends Controller
             $post->post_cate_id = $request->post_cate_id;
             $post->save();
 
-            if(!empty($request->image))
-            {
-                $this->addImagePost($post,$request->image,true);
+            if (!empty($request->image)) {
+                $this->addImagePost($post, $request->image, true);
             }
 
             return redirect()->route('admin.post.index')->with('success', 'Tạo bài viết thành công');
         }
 
         //Edit
-        $post = Post::where('id',$request->id)->whereNull('deleted_at')->first();
-        if(empty($post))
-        {
+        $post = Post::where('id', $request->id)->whereNull('deleted_at')->first();
+        if (empty($post)) {
             return redirect()->back()->with('error', 'Không tìm thấy bài viết');
         }
-        
-        $post_check = Post::whereNull('deleted_at')->where('id','<>',$request->id)->where('name',$request->name)->get();
-        if(count($post_check)>0)
-        {
+
+        $post_check = Post::whereNull('deleted_at')->where('id', '<>', $request->id)->where('name', $request->name)->get();
+        if (count($post_check) > 0) {
             return redirect()->back()->with('error', 'Đã có tên bài viết');
         }
 
@@ -193,18 +184,18 @@ class PostController extends Controller
         $post->path = $request->path;
         $post->post_cate_id = $request->post_cate_id;
         $post->save();
-        
-        if(!empty($request->image))
-        {
-            if(!empty($request->id_img))
-            {
+
+        if (!empty($request->image)) {
+            if (!empty($request->id_img)) {
                 $image = ImagePost::find($request->id_img);
-                if(File::exists(public_path().$image->path)) {
-                    File::delete(public_path().$image->path);
+                if ($image) {
+                    if (File::exists(public_path() . $image->path)) {
+                        File::delete(public_path() . $image->path);
+                    }
+                    $image->forceDelete();
                 }
-                $image->forceDelete();
             }
-            $this->addImagePost($post,$request->image,true);
+            $this->addImagePost($post, $request->image, true);
         }
 
         return redirect()->back()->with('success', 'Cập nhật bài viết thành công');
@@ -214,20 +205,16 @@ class PostController extends Controller
     {
         // dd(json_decode($request->list_id));
         $list_id = json_decode($request->list_id);
-        foreach($list_id as $id)
-        {
+        foreach ($list_id as $id) {
             $post = Post::find($id);
-            if(!empty($post))
-            {
+            if (!empty($post)) {
                 $images = ImagePost::whereNull('deleted_at')
-                                        ->where('post_id',$post->id)
-                                        ->get();
-                if(count($images) > 0)
-                {
-                    foreach($images as $image)
-                    {
-                        if(File::exists(public_path().$image->path)) {
-                            File::delete(public_path().$image->path);
+                    ->where('post_id', $post->id)
+                    ->get();
+                if (count($images) > 0) {
+                    foreach ($images as $image) {
+                        if (File::exists(public_path() . $image->path)) {
+                            File::delete(public_path() . $image->path);
                         }
                         $image->forceDelete();
                     }
@@ -238,5 +225,4 @@ class PostController extends Controller
         }
         return redirect()->back()->with('success', 'Xóa bài viết thành công');
     }
-
 }

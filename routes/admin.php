@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 //Dashboard
 Route::get('dashboard', 'DashboardController@index')->name('admin.dashboard.index');
@@ -16,8 +17,8 @@ Route::get('user/create', 'UserController@create')->name('admin.user.create');
 Route::get('user/edit/{id}', 'UserController@edit')->name('admin.user.edit');
 Route::post('user/store', 'UserController@store')->name('admin.user.store');
 Route::delete('user/delete', 'UserController@delete')->name('admin.user.delete');
-Route::get('user/{id}/reset-password','UserController@getResetPassword')->name('admin.resetpassword.get');
-Route::post('user/{id}/reset-password','UserController@postResetPassword')->name('admin.resetpassword.post');
+Route::get('user/{id}/reset-password', 'UserController@getResetPassword')->name('admin.resetpassword.get');
+Route::post('user/{id}/reset-password', 'UserController@postResetPassword')->name('admin.resetpassword.post');
 
 
 //Role
@@ -60,7 +61,7 @@ Route::get('color', 'ColorController@index')->name('admin.color.index');
 Route::get('color/create', 'ColorController@create')->name('admin.color.create');
 Route::get('color/edit/{id}', 'ColorController@edit')->name('admin.color.edit');
 Route::post('color/store', 'ColorController@store')->name('admin.color.store');
-Route::delete('color/delete', 'ColorController@delete')->name('admin.color.delete'); 
+Route::delete('color/delete', 'ColorController@delete')->name('admin.color.delete');
 Route::delete('color/delete', 'ColorController@delete')->name('admin.color.delete');
 
 //Slide
@@ -87,7 +88,7 @@ Route::get('product_tag', 'ProductTagController@index')->name('admin.product_tag
 Route::get('product_tag/create', 'ProductTagController@create')->name('admin.product_tag.create');
 Route::get('product_tag/edit/{id}', 'ProductTagController@edit')->name('admin.product_tag.edit');
 Route::post('taproduct_tag/store', 'ProductTagController@store')->name('admin.product_tag.store');
-Route::delete('product_tag/delete', 'ProductTagController@delete')->name('admin.product_tag.delete'); 
+Route::delete('product_tag/delete', 'ProductTagController@delete')->name('admin.product_tag.delete');
 
 //Wishlist
 Route::get('wishlist', 'WishlistController@index')->name('admin.wishlist.index');
@@ -97,7 +98,7 @@ Route::delete('wishlist/delete', 'WishlistController@delete')->name('admin.wishl
 
 //Order
 Route::get('order', 'OrderController@index')->name('admin.order.index');
-Route::get('/order-online-unpaid','OrderController@orderOnlineUnpaid')->name('admin.order.order_online_unpaid');
+Route::get('/order-online-unpaid', 'OrderController@orderOnlineUnpaid')->name('admin.order.order_online_unpaid');
 Route::put('order/{id}', 'OrderController@update')->name('admin.order.update');
 Route::delete('order/delete', 'OrderController@delete')->name('admin.order.delete');
 
@@ -113,7 +114,7 @@ Route::get('discount', 'DiscountController@index')->name('admin.discount.index')
 Route::get('discount/create', 'DiscountController@create')->name('admin.discount.create');
 Route::get('discount/detail/{id}', 'DiscountController@edit')->name('admin.discount.edit');
 Route::post('discount/store', 'DiscountController@store')->name('admin.discount.store');
-Route::delete('discount/delete', 'DiscountController@delete')->name('admin.discount.delete'); 
+Route::delete('discount/delete', 'DiscountController@delete')->name('admin.discount.delete');
 
 //Comment
 Route::get('product/{id}/comment', 'CommentController@index')->name('admin.comment.index');
@@ -129,11 +130,11 @@ Route::delete('ship/delete', 'ShipController@delete')->name('admin.ship.delete')
 
 
 //PostCate
-Route::get('postcate', 'PostCateController@index')->name('admin.post_cate.index');
-Route::get('postcate/create', 'PostCateController@create')->name('admin.post_cate.create');
-Route::get('postcate/edit/{id}', 'PostCateController@edit')->name('admin.post_cate.edit');
-Route::post('postcate/store', 'PostCateController@store')->name('admin.post_cate.store');
-Route::delete('postcate/delete', 'PostCateController@delete')->name('admin.post_cate.delete');
+Route::get('PostCate', 'PostCateController@index')->name('admin.post_cate.index');
+Route::get('PostCate/create', 'PostCateController@create')->name('admin.post_cate.create');
+Route::get('PostCate/edit/{id}', 'PostCateController@edit')->name('admin.post_cate.edit');
+Route::post('PostCate/store', 'PostCateController@store')->name('admin.post_cate.store');
+Route::delete('PostCate/delete', 'PostCateController@delete')->name('admin.post_cate.delete');
 
 //Post
 Route::get('post', 'PostController@index')->name('admin.post.index');

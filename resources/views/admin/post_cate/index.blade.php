@@ -12,7 +12,7 @@
                     <div class="card">
                         <div  class="card-header" style="display:flex;">
                             {{-- Form delete --}}
-                            <form id="delete-postcate" action="{{ route('admin.post_cate.delete') }}" method="POST" style=" display: inline;">
+                            <form id="delete-PostCate" action="{{ route('admin.post_cate.delete') }}" method="POST" style=" display: inline;">
                                 @csrf
                                 @method('DELETE')
                                 <input type="hidden" name="list_id" id="list_id" value="">
@@ -80,7 +80,7 @@
                 </div>
             </div>
         </div>
-        <div id="modal-postcate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+        <div id="modal-PostCate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
             <div role="document" class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -88,16 +88,16 @@
                         <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">×</span></button>
                     </div>
                     <div class="modal-body">
-                        <form id="form-postcate" action="{{route('admin.post_cate.store')}}" method="POST">
+                        <form id="form-PostCate" action="{{route('admin.post_cate.store')}}" method="POST">
                             @csrf
-                            <input type="hidden" name="id_postcate" id="id_postcate" value="">
+                            <input type="hidden" name="id_PostCate" id="id_PostCate" value="">
                             <div class="form-group">
                                 <label class="label">Tên</label>
-                                <input type="text" placeholder="Tên danh mục" name="name_postcate" id="name_postcate" class="form-control" onkeyup="ChangeToSlug();">
-                                <div class="error error-postcate">Nhập tên danh mục</div>
+                                <input type="text" placeholder="Tên danh mục" name="name_PostCate" id="name_PostCate" class="form-control" onkeyup="ChangeToSlug();">
+                                <div class="error error-PostCate">Nhập tên danh mục</div>
                                 <label class="label">Đường dẫn</label>
-                                <input type="text" placeholder="Đường dẫn" name="path_postcate" id="path_postcate" class="form-control" readonly onkeyup="ChangeToSlug();">
-                                <div class="error error-postcate">Nhập tên danh mục để có đường dẫn</div>
+                                <input type="text" placeholder="Đường dẫn" name="path_PostCate" id="path_PostCate" class="form-control" readonly onkeyup="ChangeToSlug();">
+                                <div class="error error-PostCate">Nhập tên danh mục để có đường dẫn</div>
                             </div>
                         </form>
                     </div>
@@ -120,10 +120,10 @@
       let post_name = $(this).data('name');
       let post_path = $(this).data('post_path');
       $('.modal-title').html('Cập nhật danh mục');
-      $('#id_postcate').val(id);
-      $('#name_postcate').val(post_name);
-      $('#path_postcate').val(post_path);
-      $('#modal-postcate').modal('show');
+      $('#id_PostCate').val(id);
+      $('#name_PostCate').val(post_name);
+      $('#path_PostCate').val(post_path);
+      $('#modal-PostCate').modal('show');
     });
     
     //click delete
@@ -145,58 +145,58 @@
          }
       });
       $('#list_id').val(JSON.stringify(list_id));
-      $('#delete-postcate').submit();
+      $('#delete-PostCate').submit();
     })
     //click create
     $('.btn-create').click(function(){
       let url = $(this).data('url');
-      $('#form-postcate').attr('action',url);
+      $('#form-PostCate').attr('action',url);
       $('.modal-title').html('Tạo danh mục');
-      $('#name_postcate').val('');
-      $('#path_postcate').val('');
-      $('#modal-postcate').modal('show');
+      $('#name_PostCate').val('');
+      $('#path_PostCate').val('');
+      $('#modal-PostCate').modal('show');
     });
     $('#save').click(function(){
-      if($('#name_postcate').val() == '')
+      if($('#name_PostCate').val() == '')
       {
-        $('.error-postcate').css('display','block');
+        $('.error-PostCate').css('display','block');
         return;
       }
       $('.btn-disabled').prop('disabled', true);
-      $('#form-postcate').submit();
+      $('#form-PostCate').submit();
     })
-    $('#modal-postcate').on('hidden.bs.modal', function (e) {
-      $('.error-postcate').css('display','none');
+    $('#modal-PostCate').on('hidden.bs.modal', function (e) {
+      $('.error-PostCate').css('display','none');
     })
   </script> 
   <script type="text/javascript">
 		function ChangeToSlug(){
-			var name_postcate;
+			var name_PostCate;
 			//Lấy text từ thẻ input title
-			name_postcate = document.getElementById("name_postcate").value;
-			name_postcate = name_postcate.toLowerCase();
+			name_PostCate = document.getElementById("name_PostCate").value;
+			name_PostCate = name_PostCate.toLowerCase();
 			//Đổi ký tự có dấu thành không dấu
-			name_postcate = name_postcate.replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
-			name_postcate = name_postcate.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
-			name_postcate = name_postcate.replace(/í|ì|ỉ|ĩ|ị/gi, 'i');
-			name_postcate = name_postcate.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
-			name_postcate = name_postcate.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
-			name_postcate = name_postcate.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
-			name_postcate = name_postcate.replace(/đ/gi, 'd');
+			name_PostCate = name_PostCate.replace(/á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
+			name_PostCate = name_PostCate.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
+			name_PostCate = name_PostCate.replace(/í|ì|ỉ|ĩ|ị/gi, 'i');
+			name_PostCate = name_PostCate.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
+			name_PostCate = name_PostCate.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
+			name_PostCate = name_PostCate.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
+			name_PostCate = name_PostCate.replace(/đ/gi, 'd');
 			//Xóa các ký tự đặc biệt
-			name_postcate = name_postcate.replace(/\`|\~|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|\‘|\’|\“|\”|\…|\–|_/gi, '');
+			name_PostCate = name_PostCate.replace(/\`|\~|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|\‘|\’|\“|\”|\…|\–|_/gi, '');
 			//Đổi khoảng trắng thành ký tự gạch ngang
-			name_postcate = name_postcate.replace(/ /gi, "-");
+			name_PostCate = name_PostCate.replace(/ /gi, "-");
 			//Đổi nhiều ký tự gạch ngang liên tiếp thành 1 ký tự gạch ngang
 			//Phòng trường hợp người nhập vào quá nhiều ký tự trắng
-			name_postcate = name_postcate.replace(/\-\-\-\-\-/gi, '-');
-			name_postcate = name_postcate.replace(/\-\-\-\-/gi, '-');
-			name_postcate = name_postcate.replace(/\-\-\-/gi, '-');
-			name_postcate = name_postcate.replace(/\-\-/gi, '-');
+			name_PostCate = name_PostCate.replace(/\-\-\-\-\-/gi, '-');
+			name_PostCate = name_PostCate.replace(/\-\-\-\-/gi, '-');
+			name_PostCate = name_PostCate.replace(/\-\-\-/gi, '-');
+			name_PostCate = name_PostCate.replace(/\-\-/gi, '-');
 			//Xóa các ký tự gạch ngang ở đầu và cuối
-			name_postcate = '@' + name_postcate + '@';
-			name_postcate = name_postcate.replace(/\@-|\-@|\@/gi, '');
-			document.getElementById('path_postcate').value = name_postcate;
+			name_PostCate = '@' + name_PostCate + '@';
+			name_PostCate = name_PostCate.replace(/\@-|\-@|\@/gi, '');
+			document.getElementById('path_PostCate').value = name_PostCate;
 		}
     </script>
 @endsection

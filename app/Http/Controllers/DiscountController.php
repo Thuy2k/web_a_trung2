@@ -18,18 +18,17 @@ class DiscountController extends Controller
     public function index(Request $request)
     {
         // dd(Session::all());
-        if(!Auth::check())
-        {
+        if (!Auth::check()) {
             return redirect('/login');
         }
         $categories = Category::whereNull('deleted_at')->get();
         $discounts = Discount::whereNull('deleted_at')
-                        ->where('start_date','<=',Carbon::now()->format('Y-m-d') )
-                        ->where('end_date','>=',Carbon::now()->format('Y-m-d') )
-                        ->where('user_apply',Auth::id())
-                        ->where('active',0)
-                        ->paginate(10);
-        $category_post = PostCate::where('status',1)->get();
+            ->where('start_date', '<=', Carbon::now()->format('Y-m-d'))
+            ->where('end_date', '>=', Carbon::now()->format('Y-m-d'))
+            ->where('user_apply', Auth::id())
+            ->where('active', 0)
+            ->paginate(10);
+        $category_post = PostCate::where('status', 1)->get();
         $infor_contact = InforContact::all();
         $data = [
             'categories' => $categories,
@@ -44,10 +43,10 @@ class DiscountController extends Controller
                 ],
                 [
                     'name' => 'Giảm giá',
-                    
+
                 ]
             ]
         ];
-        return view('user.discount.index',$data);
+        return view('user.discount.index', $data);
     }
 }
